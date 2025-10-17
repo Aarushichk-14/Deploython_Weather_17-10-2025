@@ -1,0 +1,31 @@
+from flask import Flask, render_template, jsonify, request
+import requests
+
+app = Flask(__name__)
+
+API_KEY = "aadd85ed5845b4f5427252a2cd26d855"
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/weather', methods=['GET'])
+def weather():
+    # Get latitude and longitude from query params
+    lat = request.args.get('lat', default='28.6139')  # Default Delhi
+    lon = request.args.get('lon', default='77.2090')
+    
+    # Current weather
+    current_url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&units=metric&appid={API_KEY}"
+    forecast_url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&units=metric&appid={API_KEY}"
+    
+    current = requests.get(current_url).json()
+    forecast = requests.get(forecast_url).json()
+    
+    return jsonify({
+        'current': current,
+        'forecast': forecast
+    })
+
+if __name__ == "__main__":
+    app.run(debug=True)
